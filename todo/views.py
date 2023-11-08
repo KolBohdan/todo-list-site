@@ -1,13 +1,38 @@
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import generic
 
-from todo.models import Tag
+from todo.forms import TaskForm
+from todo.models import Tag, Task
 
 
-def index(request: HttpRequest) -> HttpResponse:
-    return render(request, "todo/index.html")
+class TaskListView(generic.ListView):
+    model = Task
+
+
+class TaskCreateView(generic.CreateView):
+    model = Task
+    form_class = TaskForm
+    success_url = reverse_lazy("todo:task-list")
+
+
+class TaskUpdateView(generic.UpdateView):
+    model = Task
+    form_class = TaskForm
+    success_url = reverse_lazy("todo:task-list")
+
+
+class TaskDeleteView(generic.DeleteView):
+    model = Task
+    success_url = reverse_lazy("todo:task-list")
+
+
+def complete_task(request, pk):
+    task = Task.objects.get(pk=pk)
+    task.is_done = not task.is_done
+    task.save()
+    return redirect("/")
 
 
 class TagListView(generic.ListView):
