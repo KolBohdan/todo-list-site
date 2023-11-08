@@ -17,3 +17,6 @@ class Task(models.Model):
         to=Tag,
         related_name="tasks"
     )
+
+    class Meta:
+        ordering = ("is_done", "-created_at")
